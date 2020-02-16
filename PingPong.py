@@ -1,3 +1,5 @@
+import random
+
 import pygame as pg
 from GameClasses import *
 import pygame.locals
@@ -19,15 +21,12 @@ class PingPong:
         self.x = int(width / 2)
         self.y = int(height / 2)
         self.fps_clock = pygame.time.Clock()
-        self.ball = Ball(ball_radius*2, ball_radius*2, self.x, self.y, object_color, ball_radius, x_speed=1, y_speed=3)
+        x_direction = random.randint(1, 5)
+        y_direction = random.randint(1, 5)
+        self.ball = Ball(ball_radius*2, ball_radius*2, self.x, self.y, object_color, ball_radius, x_direction=x_direction, y_direction=y_direction)
 
 
     def run(self):
-        i = 0
-        timeout = 10  # [seconds]
-        timeout_start = time.time()
-        print(timeout_start)
-        # while time.time() < timeout_start + timeout:
         while not self.handle_events():
             if self.ball.rect.y >= self.window.height or self.ball.rect.y <= 0:
                 self.ball.bounce_y()
@@ -37,7 +36,7 @@ class PingPong:
 
             self.ball.move()
             self.window.draw_elements(self.ball)
-            self.fps_clock.tick(40)
+            self.fps_clock.tick(70)
 
     def handle_events(self):
         for event in pg.event.get():

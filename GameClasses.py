@@ -19,7 +19,6 @@ class Board:
 
     def draw_elements(self, *args):
         self.window.fill(self.window_color)
-        # pg.display.update()
         for element in args:
              element.draw(self.window)
         pg.display.update()
@@ -42,52 +41,30 @@ class GameObject:
         window.blit(self.surface, self.rect)
 
 class Ball(GameObject):
-    def __init__(self, width, height, x, y, color, radius, x_speed = 0, y_speed = 0):
+    def __init__(self, width, height, x, y, color, radius, x_direction = 0, y_direction = 0):
         super(Ball, self).__init__(width, height, x, y, color)
         circle = pg.draw.circle(self.surface, color, [radius, radius], radius)
         print(f'to jest circle: {circle}')
-        self.x_speed = x_speed
-        self.y_speed = y_speed
+        self.x_direction = x_direction
+        self.y_direction = y_direction
 
     def bounce_x(self):
-        self.x_speed *= -1
+        self.x_direction *= -1
 
     def bounce_y(self):
-        self.y_speed *= -1
+        self.y_direction *= -1
 
     def move(self):
-        self.rect.x += self.x_speed
-        self.rect.y += self.y_speed
+        self.rect.x += self.x_direction
+        self.rect.y += self.y_direction
         # pg.display.flip()
         print(self.rect)
 
+class Paddle(GameObject):
+    def __init__(self, width, height, x, y, color, length, y_direction):
+        super(Paddle, self).__init__(width, height, x, y, color)
+        pg.draw.line()
 
-# class GameObjects:
-#     def __init__(self, width, height, color, x, y):
-#         self.width = int(width)
-#         self.height = int(height)
-#         self.color = color
-#         self.surface = pg.Surface((self.width, self.height),  pg.SRCALPHA, 32).convert_alpha()
-#         self.rect = self.surface.get_rect(x = x, y = y)
-#         print(f'to jest Game Object self.rect: {self.rect}')
-#
-#     def draw_on(self, window):
-#         window.blit(self.surface, self.rect)
-#
-# class Ball(GameObjects):
-#     def __init__(self, width, height,  color, radius,  x_vector = 0, y_vector=0):
-#         super(Ball, self).__init__(width, height, color, x, y)
-#         self.radius = int((width**2+height**2)**(1/2)*0.5)
-#         circle = pg.draw.circle(self.surface, self.color, [0, 0], self.radius)
-#         print(f'to jest circle: {circle}')
-#         #
-#         # self.surface = pg.Surface([width, heigth])
-#         # self.ball = pg.draw.circle(self.surface, color, location, radius)
-#         # self.rect = self.surface.get_rect()
-#         # print(self.rect)
-
-    # def draw_ball(self, surface):
-    #     surface.blit(self.surface, self.rect)
 
 
 width = 1000
