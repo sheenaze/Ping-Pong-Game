@@ -23,19 +23,24 @@ class PingPong:
         self.fps_clock = pygame.time.Clock()
         x_direction = random.randint(1, 5)
         y_direction = random.randint(1, 5)
+        paddle_length = 110
+        paddle_width = 20
         self.ball = Ball(ball_radius*2, ball_radius*2, self.x, self.y, object_color, ball_radius, x_direction=x_direction, y_direction=y_direction)
-
+        self.paddle_left = Paddle(paddle_width, paddle_length, 10, self.y, object_color)
 
     def run(self):
         while not self.handle_events():
-            if self.ball.rect.y >= self.window.height or self.ball.rect.y <= 0:
+            if self.ball.rect.y >= self.window.height - self.ball.radius*2 or self.ball.rect.y <= 0:
                 self.ball.bounce_y()
 
-            if self.ball.rect.x >= self.window.width  or self.ball.rect.x <= 0:
+            if self.ball.rect.x >= self.window.width - self.ball.radius*2  or self.ball.rect.x <= 0:
                 self.ball.bounce_x()
 
             self.ball.move()
-            self.window.draw_elements(self.ball)
+            self.window.draw_elements(
+                self.ball,
+                self.paddle_left
+                                      )
             self.fps_clock.tick(70)
 
     def handle_events(self):

@@ -43,7 +43,8 @@ class GameObject:
 class Ball(GameObject):
     def __init__(self, width, height, x, y, color, radius, x_direction = 0, y_direction = 0):
         super(Ball, self).__init__(width, height, x, y, color)
-        circle = pg.draw.circle(self.surface, color, [radius, radius], radius)
+        self.radius = radius
+        circle = pg.draw.circle(self.surface, color, [self.radius, self.radius], self.radius)
         print(f'to jest circle: {circle}')
         self.x_direction = x_direction
         self.y_direction = y_direction
@@ -61,9 +62,10 @@ class Ball(GameObject):
         print(self.rect)
 
 class Paddle(GameObject):
-    def __init__(self, width, height, x, y, color, length, y_direction):
+    def __init__(self, width, height, x, y, color, y_direction = 0):
         super(Paddle, self).__init__(width, height, x, y, color)
-        pg.draw.line()
+        pg.draw.line(self.surface, color, [0,0], [0, self.height], 15)
+        # pg.draw.ellipse(self.surface, color, (0, 0, self.width, self.height))
 
 
 
