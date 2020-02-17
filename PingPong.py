@@ -29,11 +29,19 @@ class PingPong:
         # parameters for paddles
         paddle_length = 110
         paddle_width = 20
+        # the left one
         self.left_pad_x_start = 30
         self.left_pad_y_start = self.y_mid-int(paddle_length/2)
 
-
         self.left_paddle = Paddle(paddle_width, paddle_length, self.left_pad_x_start, self.left_pad_y_start , object_color)
+
+        # the right one
+        self.right_pad_x_start = self.window.width - 40
+        self.right_pad_y_start = self.y_mid-int(paddle_length/2)
+
+        self.right_paddle = Paddle(paddle_width, paddle_length, self.right_pad_x_start, self.right_pad_y_start , object_color)
+
+
 
     def run(self):
         while not self.handle_events():
@@ -46,7 +54,8 @@ class PingPong:
             self.ball.move()
             self.window.draw_elements(
                 self.ball,
-                self.left_paddle
+                self.left_paddle,
+                self.right_paddle
                                       )
             self.fps_clock.tick(70)
 
