@@ -6,16 +6,13 @@ import time
 
 
 class Board:
-    def __init__(self, width, height):
+    def __init__(self, width, height, window_color):
         self.width = width
         self.height = height
+        self.window_color = window_color
         self.window = pg.display.set_mode((width, height), 0, 32)
         pg.display.set_caption("PingPong by Mon")
 
-    def changeWindowColor(self, window_color):
-        self.window_color = window_color
-        self.window.fill(window_color)
-        pg.display.update()
 
     def draw_elements(self, *args):
         self.window.fill(self.window_color)
@@ -64,7 +61,7 @@ class Ball(GameObject):
 class Paddle(GameObject):
     def __init__(self, width, height, x, y, color, y_direction = 0):
         super(Paddle, self).__init__(width, height, x, y, color)
-        pg.draw.line(self.surface, color, [0,0], [0, self.height], 15)
+        pg.draw.line(self.surface, color, [0,0], [0, self.height], 20)
         # pg.draw.ellipse(self.surface, color, (0, 0, self.width, self.height))
 
 
@@ -98,9 +95,6 @@ radius = 10
 
 
 # time.sleep(10)
-
-
-
 
 
 

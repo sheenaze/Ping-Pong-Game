@@ -4,29 +4,36 @@ import pygame as pg
 from GameClasses import *
 import pygame.locals
 
-window_color = (10,200,100)
-width = 1000
-height = 1000
-x = int(width/2)
-y = int(height/2)
-object_color = (255, 255, 255)
-radius = 10
+
 
 class PingPong:
-    def __init__(self, window_width = width, window_height = height, window_color = window_color, paddles_color = object_color, ball_radius = radius, ball_color = object_color):
+    def __init__(self, window_width, window_height, window_color, paddles_color, ball_radius, ball_color):
         pg.init()
 
-        self.window = Board(window_width, window_height)
-        self.window.changeWindowColor(window_color)
-        self.x = int(width / 2)
-        self.y = int(height / 2)
+        # window parameters
+        self.window = Board(window_width, window_height, window_color)
+        self.x_mid = int(width / 2)
+        self.y_mid = int(height / 2)
         self.fps_clock = pygame.time.Clock()
-        x_direction = random.randint(1, 5)
-        y_direction = random.randint(1, 5)
+
+        # parameters for a ball
+        ball_suf_width = ball_radius * 2
+        ball_suf_height = ball_radius * 2
+        ball_x_speed = random.randint(1, 5)
+        ball_y_speed = random.randint(1, 5)
+        self.ball_x_start = self.x_mid
+        self.ball_y_start = self.y_mid
+
+        self.ball = Ball(ball_suf_width, ball_suf_height, self.ball_x_start, self.ball_y_start, ball_color, ball_radius, ball_x_speed, ball_y_speed)
+
+        # parameters for paddles
         paddle_length = 110
         paddle_width = 20
-        self.ball = Ball(ball_radius*2, ball_radius*2, self.x, self.y, object_color, ball_radius, x_direction=x_direction, y_direction=y_direction)
-        self.paddle_left = Paddle(paddle_width, paddle_length, 10, self.y, object_color)
+        self.left_pad_x_start = 30
+        self.left_pad_y_start = self.y_mid-int(paddle_length/2)
+
+
+        self.left_paddle = Paddle(paddle_width, paddle_length, self.left_pad_x_start, self.left_pad_y_start , object_color)
 
     def run(self):
         while not self.handle_events():
@@ -39,7 +46,7 @@ class PingPong:
             self.ball.move()
             self.window.draw_elements(
                 self.ball,
-                self.paddle_left
+                self.left_paddle
                                       )
             self.fps_clock.tick(70)
 
@@ -53,7 +60,16 @@ class PingPong:
 
 
 if __name__ == "__main__":
-    game = PingPong()
+    window_color = (10, 200, 100)
+    window_width = 1000
+    window_height = 1000
+    x = int(width / 2)
+    y = int(height / 2)
+    object_color = (255, 255, 255)
+    radius = 10
+
+
+    game = PingPong( window_width, window_height, window_color, object_color, radius, object_color)
     game.run()
     # game.windowLook((10, 100, 200))
     time.sleep(10)
