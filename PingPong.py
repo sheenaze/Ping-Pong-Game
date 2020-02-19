@@ -1,6 +1,7 @@
 import random
 from GameClasses import *
 import pygame.locals
+from pynput import keyboard
 
 
 class PingPong:
@@ -44,10 +45,15 @@ class PingPong:
 
     def move(self, key):
         try:
-            if key.char == 'w' and self.left_paddle.rect.y > 0:
+            if key == keyboard.Key.up and self.right_paddle.rect.y > 0:
+                self.right_paddle.move_paddle_up()
+            elif key == keyboard.Key.down and self.right_paddle.rect.y < self.window.height - self.paddle_length:
+                self.right_paddle.move_paddle_down()
+            elif key.char == 'w' and self.left_paddle.rect.y > 0:
                 self.left_paddle.move_paddle_up()
             elif key.char == 's' and self.left_paddle.rect.y < self.window.height - self.paddle_length:
                 self.left_paddle.move_paddle_down()
+
         except Exception:
             print(False)
 
@@ -56,11 +62,20 @@ class PingPong:
             on_press=self.move)
         self.listener.start()
         while not self.handle_events():
+            left_paddle_X = self.left_paddle.rect.x + self.paddle_width
+            left_paddle_Y_up = self.left_paddle.rect.y
+            left_paddle_Y_down = self.left_paddle.rect.y + self.paddle_length
+
+            right_paddle_X = self.right_paddle.rect.x - self.paddle_width
+            right_paddle_Y_up = self.right_paddle.rect.y
+            right_paddle_Y_down = self.right_paddle.rect.y + self.paddle_length
 
             if self.ball.rect.y >= self.window.height - self.ball.radius * 2 or self.ball.rect.y <= 0:
                 self.ball.bounce_y()
 
-            if self.ball.rect.x >= self.window.width - self.ball.radius * 2 or self.ball.rect.x <= 0:
+            if self.ball.rect.x >= self.window.width - self.ball.radius * 2 or self.ball.rect.x <= 0 or (
+                    self.ball.rect.x <= left_paddle_X and left_paddle_Y_up <= self.ball.rect.y <= left_paddle_Y_down) or (
+                    self.ball.rect.x >= right_paddle_X and right_paddle_Y_up <= self.ball.rect.y <= right_paddle_Y_down):
                 self.ball.bounce_x()
 
             self.ball.move()
