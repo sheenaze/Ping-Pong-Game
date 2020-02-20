@@ -62,7 +62,7 @@ class PingPong:
             on_press=self.move)
         self.listener.start()
         while not self.handle_events():
-            left_paddle_X = self.left_paddle.rect.x + self.paddle_width
+            left_paddle_X = self.left_paddle.rect.x + self.paddle_width-self.ball.radius
             left_paddle_Y_up = self.left_paddle.rect.y
             left_paddle_Y_down = self.left_paddle.rect.y + self.paddle_length
 

@@ -70,7 +70,7 @@ class Ball(GameObject):
 
 
 class Paddle(GameObject):
-    def __init__(self, width, height, x, y, color, y_direction= 50):
+    def __init__(self, width, height, x, y, color, y_direction= 150):
         self.y_direction = y_direction
         super(Paddle, self).__init__(width, height, x, y, color)
         pg.draw.line(self.surface, color, [0, 0], [0, self.height], 20)
