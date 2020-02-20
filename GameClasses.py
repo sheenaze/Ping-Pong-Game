@@ -76,6 +76,9 @@ class Paddle(GameObject):
         pg.draw.line(self.surface, color, [0, 0], [0, self.height], 20)
         # pg.draw.ellipse(self.surface, color, (0, 0, self.width, self.height))
 
+
+
+
     def move_paddle_up(self):
         self.rect.y -= self.y_direction
 
