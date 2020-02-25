@@ -2,3 +2,7 @@
 venv/
 *.txt
 *local_settings.py
+__init__.py
+function_tests.py
+original code.py
+__pycache__

@@ -65,10 +65,6 @@ class PingPong:
         paddle_y_down = paddle.rect.y + self.paddle_length
         return [paddle_x, paddle_y_down, paddle_y_up]
 
-    def board_collisions(self):
-        if self.ball.rect.y >= self.window.height - self.ball.radius * 2 or self.ball.rect.y <= 0:
-            self.ball.bounce_y()
-
     def left_paddle_collisions(self):
         left_paddle_position = self.get_paddle_position(self.left_paddle, self.paddle_width, -self.ball.radius)
         if (self.ball.rect.x <= left_paddle_position[0] and left_paddle_position[2] <= self.ball.rect.y <=
@@ -81,31 +77,45 @@ class PingPong:
                 right_paddle_position[1]:
             self.ball.bounce_x()
 
+    def result_counter_print(self, counter_left, counter_right):
+        font = pygame.font.Font('freesansbold.ttf', 32)
+        text = font.render(f'{counter_left}:{counter_right}', True, (0, 0, 0), (255, 255, 255))
+        text_rect = text.get_rect()
+        text_rect.center = (self.x_mid, 100)
+        return text
+
+    # def result_counter(self, counter_left=0, counter_right=0):
+    #     left_paddle_position = self.get_paddle_position(self.left_paddle, self.paddle_width, -self.ball.radius)
+    #     right_paddle_position = self.get_paddle_position(self.right_paddle, -self.paddle_width)
+    #     if self.ball.rect.x <= left_paddle_position[0]:
+    #         counter_right +=1
+    #     elif self.ball.rect.x >= right_paddle_position[0]:
+    #         counter_left += 1
+    #
+    #     return self.result_counter_print(counter_left, counter_right)
 
     def run(self):
+        counter_left = 0
+        counter_right = 0
         self.listener = keyboard.Listener(
             on_press=self.move_paddles)
         self.listener.start()
 
         while not self.handle_events():
-            self.board_collisions()
+            self.ball.move()
+            self.ball.board_collision(self.window.rect)
+            # self.ball.on_board_collision(self.window)
+
             self.left_paddle_collisions()
             self.right_paddle_collisions()
 
-            # if (self.ball.rect.x <= left_paddle_position[0] and left_paddle_position[2] <= self.ball.rect.y <=
-            #     left_paddle_position[1]) or (
-            #         self.ball.rect.x >= right_paddle_position[0] and right_paddle_position[2] <= self.ball.rect.y <=
-            #         right_paddle_position[1]):
-            #     self.ball.bounce_x()
-
-            self.ball.move()
+            self.result_counter_print(10, 15)
             self.window.draw_elements(
                 self.ball,
                 self.left_paddle,
                 self.right_paddle
             )
-            self.fps_clock.tick(70)
-
+            self.fps_clock.tick(100)
 
     def handle_events(self):
         for event in pg.event.get():

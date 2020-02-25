@@ -23,7 +23,9 @@ class Board:
         self.height = height
         self.window_color = window_color
         self.window = pg.display.set_mode((width, height), 0, 32)
+        self.rect = self.window.get_rect()
         pg.display.set_caption("PingPong by Mon")
+
 
     def draw_elements(self, *args):
         self.window.fill(self.window_color)
@@ -65,19 +67,31 @@ class Ball(GameObject):
     def move(self):
         self.rect.x += self.x_direction
         self.rect.y += self.y_direction
-        # pg.display.flip()
         print(self.rect)
+
+    def board_collision(self, rect_object):
+        x_left = rect_object[0]
+        x_right = rect_object[0] + rect_object[2]
+        y_up = rect_object[1]
+        y_bottom = rect_object[1]+rect_object[3]
+
+        if self.rect.y <= y_up or self.rect.y+2*self.radius>= y_bottom:
+            self.bounce_y()
+
+        if self.rect.x <= x_left or self.rect.x+2*self.radius >= x_right:
+            self.bounce_x()
+
+    def paddle_collision(self, rect_object):
+        pass
 
 
 class Paddle(GameObject):
-    def __init__(self, width, height, x, y, color, y_direction= 150):
-        self.y_direction = y_direction
+    def __init__(self, width, height, x, y, color, y_direction=100):
         super(Paddle, self).__init__(width, height, x, y, color)
+        self.y_direction = y_direction
         pg.draw.line(self.surface, color, [0, 0], [0, self.height], 20)
+
         # pg.draw.ellipse(self.surface, color, (0, 0, self.width, self.height))
-
-
-
 
     def move_paddle_up(self):
         self.rect.y -= self.y_direction
@@ -85,5 +99,15 @@ class Paddle(GameObject):
     def move_paddle_down(self):
         self.rect.y += self.y_direction
 
+    def get_paddle_line(self, *args):
+        paddle_x = self.rect.x
+        for arg in args:
+            paddle_x += arg
+        paddle_y_up = self.rect.y
+        paddle_y_down = self.rect.y + self.height
+        return [paddle_x, paddle_y_up,  paddle_y_down]
+
     # def move_left_paddle(self, key_name_up, key_name_down):
     #     pass
+board = Board(500, 700, (100,100,100))
+print(board)
