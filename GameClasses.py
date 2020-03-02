@@ -1,21 +1,7 @@
 import pygame as pg
 from pynput import keyboard
-
-
-def on_press(key):
-    try:
-        # return key.char
-        print(f'alphanumeric key {key.char} pressed')
-    except AttributeError:
-        print(f'special key {key} pressed')
-
-
-def on_release(key):
-    print(f'{key} released')
-    if key == keyboard.Key.esc:
-        # Stop listener
-        return False
-
+import time
+import random
 
 class Board:
     def __init__(self, width, height, window_color):
@@ -26,7 +12,6 @@ class Board:
         self.rect = self.window.get_rect()
         pg.display.set_caption("PingPong by Mon")
 
-
     def draw_elements(self, *args):
         self.window.fill(self.window_color)
         for element in args:
@@ -34,7 +19,7 @@ class Board:
         pg.display.update()
 
 
-class GameObject:
+class Object:
     def __init__(self, width, height, x, y, color):
         self.width = int(width)
         self.height = int(height)
@@ -43,20 +28,18 @@ class GameObject:
         self.color = color
         self.surface = pg.Surface((self.width, self.height), pg.SRCALPHA, 32).convert_alpha()
         self.rect = self.surface.get_rect(x=self.start_x, y=self.start_y)
-        print(f'to jest Game Object self.rect: {self.rect}')
 
     def draw(self, window):
         window.blit(self.surface, self.rect)
 
 
-class Ball(GameObject):
+class Ball(Object):
     def __init__(self, width, height, x, y, color, radius, x_direction=0, y_direction=0):
         super(Ball, self).__init__(width, height, x, y, color)
         self.radius = radius
-        circle = pg.draw.circle(self.surface, color, [self.radius, self.radius], self.radius)
-        print(f'to jest circle: {circle}')
         self.x_direction = x_direction
         self.y_direction = y_direction
+        pg.draw.circle(self.surface, color, [self.radius, self.radius], self.radius)
 
     def bounce_x(self):
         self.x_direction *= -1
@@ -67,25 +50,9 @@ class Ball(GameObject):
     def move(self):
         self.rect.x += self.x_direction
         self.rect.y += self.y_direction
-        print(self.rect)
-
-    def board_collision(self, rect_object):
-        x_left = rect_object[0]
-        x_right = rect_object[0] + rect_object[2]
-        y_up = rect_object[1]
-        y_bottom = rect_object[1]+rect_object[3]
-
-        if self.rect.y <= y_up or self.rect.y+2*self.radius>= y_bottom:
-            self.bounce_y()
-
-        if self.rect.x <= x_left or self.rect.x+2*self.radius >= x_right:
-            self.bounce_x()
-
-    def paddle_collision(self, rect_object):
-        pass
 
 
-class Paddle(GameObject):
+class Paddle(Object):
     def __init__(self, width, height, x, y, color, y_direction=100):
         super(Paddle, self).__init__(width, height, x, y, color)
         self.y_direction = y_direction
@@ -99,15 +66,49 @@ class Paddle(GameObject):
     def move_paddle_down(self):
         self.rect.y += self.y_direction
 
-    def get_paddle_line(self, *args):
-        paddle_x = self.rect.x
-        for arg in args:
-            paddle_x += arg
-        paddle_y_up = self.rect.y
-        paddle_y_down = self.rect.y + self.height
-        return [paddle_x, paddle_y_up,  paddle_y_down]
 
-    # def move_left_paddle(self, key_name_up, key_name_down):
-    #     pass
-board = Board(500, 700, (100,100,100))
-print(board)
+class LocalListener:
+    def __init__(self, function_name):
+        self.listener = keyboard.Listener(
+            on_press=function_name
+        )
+
+    def listen(self):
+        self.listener.start()
+
+
+class GameObjects:
+    def __init__(self, window_width, window_height, paddles_color, ball_radius, ball_color):
+        self.window_width = window_width
+        self.x_mid = int(window_width / 2)
+        self.y_mid = int(window_height / 2)
+        self.paddles_color = paddles_color
+        self.ball_color = ball_color
+        self.ball_radius = ball_radius
+        self.paddle_length = 110
+        self.paddle_width = 20
+
+    def get_ball(self):
+        # parameters for a ball
+        ball_surf_width = self.ball_radius * 2
+        ball_surf_height = self.ball_radius * 2
+        ball_x_speed = random.randint(1, 5)
+        ball_y_speed = random.randint(1, 5)
+        #
+        ball_x_start = self.x_mid
+        ball_y_start = self.y_mid
+        #
+        return Ball(ball_surf_width, ball_surf_height, ball_x_start, ball_y_start, self.ball_color,
+                    self.ball_radius, ball_x_speed, ball_y_speed)
+
+    def get_left_paddle(self):
+        left_pad_x_start = 30
+        left_pad_y_start = self.y_mid - int(self.paddle_length / 2)
+
+        return Paddle(self.paddle_width, self.paddle_length, left_pad_x_start, left_pad_y_start, self.paddles_color)
+
+    def get_right_paddle(self):
+        right_pad_x_start = self.window_width - 30 - self.paddle_width
+        right_pad_y_start = self.y_mid - int(self.paddle_length / 2)
+        #
+        return Paddle(self.paddle_width, self.paddle_length, right_pad_x_start, right_pad_y_start, self.paddles_color)
