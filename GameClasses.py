@@ -67,6 +67,34 @@ class Paddle(Object):
         self.rect.y += self.y_direction
 
 
+class DetectCollisions:
+    def __init__(self, object_rect):
+        self.x_min = object_rect[0]
+        self.y_min = object_rect[1]
+        self.x_max = object_rect[0] + object_rect[2]
+        self.y_max = object_rect[1] + object_rect[3]
+
+    def object_included_collision(self, outside_object_rect):
+        board_x_min = outside_object_rect[0]
+        board_x_max = outside_object_rect[0] + outside_object_rect[2]
+        board_y_min = outside_object_rect[1]
+        board_y_max = outside_object_rect[1] + outside_object_rect[3]
+
+        return not (self.x_min > board_x_min and self.x_max < board_x_max and self.y_min > board_y_min and
+                    self.y_max < board_y_max)
+
+    def object_excluded_collision(self, object_rect):
+        pass
+
+        object_x_min = object_rect[0]
+        object_y_min = object_rect[1]
+        object_x_max = object_rect[0] + object_rect[2]
+        object_y_max = object_rect[1] + object_rect[3]
+
+        return not (self.x_max < object_x_min or self.x_min > object_x_max or self.y_max < object_y_min or
+                    self.y_min > object_y_max)
+
+
 class LocalListener:
     def __init__(self, function_name):
         self.listener = keyboard.Listener(
