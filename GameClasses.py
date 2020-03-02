@@ -106,7 +106,7 @@ class LocalListener:
         self.listener.start()
 
 
-class GameObjects:
+class CurrentGameObjects:
     def __init__(self, window_width, window_height, paddles_color, ball_radius, ball_color):
         self.window_width = window_width
         self.x_mid = int(window_width / 2)
