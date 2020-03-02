@@ -1,7 +1,8 @@
 import pygame as pg
 from pynput import keyboard
-import time
+# import time
 import random
+
 
 class Board:
     def __init__(self, width, height, window_color):
@@ -53,7 +54,7 @@ class Ball(Object):
 
 
 class Paddle(Object):
-    def __init__(self, width, height, x, y, color, y_direction=100):
+    def __init__(self, width, height, x, y, color, y_direction=90):
         super(Paddle, self).__init__(width, height, x, y, color)
         self.y_direction = y_direction
         pg.draw.line(self.surface, color, [0, 0], [0, self.height], 20)
@@ -72,7 +73,7 @@ class DetectCollisions:
         self.x_max = object_rect[0] + object_rect[2]
         self.y_max = object_rect[1] + object_rect[3]
 
-    def object_included_collision(self, outside_object_rect):
+    def included_object_collision(self, outside_object_rect):
         board_x_min = outside_object_rect[0]
         board_x_max = outside_object_rect[0] + outside_object_rect[2]
         board_y_min = outside_object_rect[1]
@@ -86,7 +87,7 @@ class DetectCollisions:
         elif not (self.y_min > board_y_min and self.y_max < board_y_max):
             return 'Y_collision'
 
-    def object_excluded_collision(self, object_rect):
+    def excluded_object_collision(self, object_rect):
 
         object_x_min = object_rect[0]
         object_y_min = object_rect[1]
@@ -102,7 +103,6 @@ class LocalListener:
         self.listener = keyboard.Listener(
             on_press=function_name
         )
-
     def listen(self):
         self.listener.start()
 
@@ -113,25 +113,37 @@ class GameActions:
         self.ball = ball
         self.paddle_left = paddle_left
         self.paddle_right = paddle_right
+        self.padle_listener = LocalListener(self.paddles_movement)
+        self.padle_listener.listen()
 
     def ball_movement(self):
         self.ball.move()
         ball_collisions = DetectCollisions(self.ball.rect)
 
-        ball_window_collision = ball_collisions.object_included_collision(self.scene.rect)
-        ball_paddle_left_collision = ball_collisions.object_excluded_collision(self.paddle_left.rect)
-        ball_paddle_right_collision = ball_collisions.object_excluded_collision(self.paddle_right.rect)
-
+        ball_window_collision = ball_collisions.included_object_collision(self.scene.rect)
+        ball_paddle_left_collision = ball_collisions.excluded_object_collision(self.paddle_left.rect)
+        ball_paddle_right_collision = ball_collisions.excluded_object_collision(self.paddle_right.rect)
 
         if ball_window_collision == 'X_collision' or ball_paddle_left_collision or ball_paddle_right_collision:
             self.ball.bounce_x()
         elif ball_window_collision == 'Y_collision':
             self.ball.bounce_y()
-        elif ball_window_collision =='XY_collision':
+        elif ball_window_collision == 'XY_collision':
             self.ball.bounce_y()
             self.ball.bounce_x()
 
-
+    def paddles_movement(self, key):
+        try:
+            if key == keyboard.Key.up and self.paddle_right.rect.y > 0:
+                self.paddle_right.move_paddle_up()
+            elif key == keyboard.Key.down and self.paddle_right.rect.y + self.paddle_right.height < self.scene.height:
+                self.paddle_right.move_paddle_down()
+            elif key.char == 'w' and self.paddle_left.rect.y > 0:
+                self.paddle_left.move_paddle_up()
+            elif key.char == 's' and self.paddle_left.rect.y + self.paddle_left.height < self.scene.height :
+                self.paddle_left.move_paddle_down()
+        except Exception:
+            print(False)
 
 
 class CurrentGameObjects:
@@ -149,8 +161,8 @@ class CurrentGameObjects:
         # parameters for a ball
         ball_surf_width = self.ball_radius * 2
         ball_surf_height = self.ball_radius * 2
-        ball_x_speed = 5#random.randint(1, 5)
-        ball_y_speed = 0#random.randint(1, 5)
+        ball_x_speed = 5  # random.randint(1, 5)
+        ball_y_speed = 0  # random.randint(1, 5)
         #
         ball_x_start = self.x_mid
         ball_y_start = self.y_mid
