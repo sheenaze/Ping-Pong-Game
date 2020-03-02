@@ -116,15 +116,22 @@ class GameActions:
 
     def ball_movement(self):
         self.ball.move()
-        # print(self.ball.rect[0])
-        ball_collsions = DetectCollisions(self.ball.rect)
-        if ball_collsions.object_included_collision(self.scene.rect) == 'X_collision':
+        ball_collisions = DetectCollisions(self.ball.rect)
+
+        ball_window_collision = ball_collisions.object_included_collision(self.scene.rect)
+        ball_paddle_left_collision = ball_collisions.object_excluded_collision(self.paddle_left.rect)
+        ball_paddle_right_collision = ball_collisions.object_excluded_collision(self.paddle_right.rect)
+
+
+        if ball_window_collision == 'X_collision' or ball_paddle_left_collision or ball_paddle_right_collision:
             self.ball.bounce_x()
-        elif ball_collsions.object_included_collision(self.scene.rect) == 'Y_collision':
+        elif ball_window_collision == 'Y_collision':
             self.ball.bounce_y()
-        elif ball_collsions.object_included_collision(self.scene.rect) == 'XY_collision':
+        elif ball_window_collision =='XY_collision':
             self.ball.bounce_y()
             self.ball.bounce_x()
+
+
 
 
 class CurrentGameObjects:
@@ -143,7 +150,7 @@ class CurrentGameObjects:
         ball_surf_width = self.ball_radius * 2
         ball_surf_height = self.ball_radius * 2
         ball_x_speed = 5#random.randint(1, 5)
-        ball_y_speed = 5#random.randint(1, 5)
+        ball_y_speed = 0#random.randint(1, 5)
         #
         ball_x_start = self.x_mid
         ball_y_start = self.y_mid
