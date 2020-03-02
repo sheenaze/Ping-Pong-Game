@@ -58,8 +58,6 @@ class Paddle(Object):
         self.y_direction = y_direction
         pg.draw.line(self.surface, color, [0, 0], [0, self.height], 20)
 
-        # pg.draw.ellipse(self.surface, color, (0, 0, self.width, self.height))
-
     def move_paddle_up(self):
         self.rect.y -= self.y_direction
 
@@ -80,7 +78,10 @@ class DetectCollisions:
         board_y_min = outside_object_rect[1]
         board_y_max = outside_object_rect[1] + outside_object_rect[3]
 
-        if not (self.x_min > board_x_min and self.x_max < board_x_max):
+        if not (self.x_min > board_x_min and self.x_max < board_x_max and self.y_min > board_y_min and
+                self.y_max < board_y_max):
+            return 'XY_collision'
+        elif not (self.x_min > board_x_min and self.x_max < board_x_max):
             return 'X_collision'
         elif not (self.y_min > board_y_min and self.y_max < board_y_max):
             return 'Y_collision'
@@ -106,6 +107,26 @@ class LocalListener:
         self.listener.start()
 
 
+class GameActions:
+    def __init__(self, scene, ball, paddle_left, paddle_right):
+        self.scene = scene
+        self.ball = ball
+        self.paddle_left = paddle_left
+        self.paddle_right = paddle_right
+
+    def ball_movement(self):
+        self.ball.move()
+        # print(self.ball.rect[0])
+        ball_collsions = DetectCollisions(self.ball.rect)
+        if ball_collsions.object_included_collision(self.scene.rect) == 'X_collision':
+            self.ball.bounce_x()
+        elif ball_collsions.object_included_collision(self.scene.rect) == 'Y_collision':
+            self.ball.bounce_y()
+        elif ball_collsions.object_included_collision(self.scene.rect) == 'XY_collision':
+            self.ball.bounce_y()
+            self.ball.bounce_x()
+
+
 class CurrentGameObjects:
     def __init__(self, window_width, window_height, paddles_color, ball_radius, ball_color):
         self.window_width = window_width
@@ -121,8 +142,8 @@ class CurrentGameObjects:
         # parameters for a ball
         ball_surf_width = self.ball_radius * 2
         ball_surf_height = self.ball_radius * 2
-        ball_x_speed = random.randint(1, 5)
-        ball_y_speed = random.randint(1, 5)
+        ball_x_speed = 5#random.randint(1, 5)
+        ball_y_speed = 5#random.randint(1, 5)
         #
         ball_x_start = self.x_mid
         ball_y_start = self.y_mid
