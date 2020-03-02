@@ -84,8 +84,7 @@ class DetectCollisions:
                     self.y_max < board_y_max)
 
     def object_excluded_collision(self, object_rect):
-        pass
-
+        
         object_x_min = object_rect[0]
         object_y_min = object_rect[1]
         object_x_max = object_rect[0] + object_rect[2]
