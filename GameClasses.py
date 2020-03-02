@@ -80,11 +80,13 @@ class DetectCollisions:
         board_y_min = outside_object_rect[1]
         board_y_max = outside_object_rect[1] + outside_object_rect[3]
 
-        return not (self.x_min > board_x_min and self.x_max < board_x_max and self.y_min > board_y_min and
-                    self.y_max < board_y_max)
+        if not (self.x_min > board_x_min and self.x_max < board_x_max):
+            return 'X_collision'
+        elif not (self.y_min > board_y_min and self.y_max < board_y_max):
+            return 'Y_collision'
 
     def object_excluded_collision(self, object_rect):
-        
+
         object_x_min = object_rect[0]
         object_y_min = object_rect[1]
         object_x_max = object_rect[0] + object_rect[2]
