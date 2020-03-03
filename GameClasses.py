@@ -36,11 +36,10 @@ class ObjectBase:
 
 
 class Counter(ObjectBase):
-    def __init__(self, width, height, x, y, color, text_color = (0,0,0)):
+    def __init__(self, width, height, x, y, color, text_color=(0, 0, 0)):
         super(Counter, self).__init__(self, width, height, x, y, color)
         self.text_color = text_color
         self.result = [0, 0]
-        
 
 
 class Ball(ObjectBase):
@@ -94,14 +93,16 @@ class DetectCollisions:
         board_y_min = outside_object_rect[1]
         board_y_max = outside_object_rect[1] + outside_object_rect[3]
 
-        if not (self.x_min > board_x_min and self.x_max < board_x_max or self.y_min > board_y_min and
-                self.y_max < board_y_max):
+        x_cond = self.x_min > board_x_min and self.x_max < board_x_max
+        y_cond = self.y_min > board_y_min and self.y_max < board_y_max
+
+        if not (x_cond or y_cond):
             return Collisions.corner_collision
 
-        elif not (self.x_min > board_x_min and self.x_max < board_x_max):
+        elif not x_cond:
             return Collisions.x_collision
 
-        elif not (self.y_min > board_y_min and self.y_max < board_y_max):
+        elif not y_cond:
             return Collisions.y_collision
 
     def excluded_object_collision(self, object_rect):
@@ -111,8 +112,10 @@ class DetectCollisions:
         object_x_max = object_rect[0] + object_rect[2]
         object_y_max = object_rect[1] + object_rect[3]
 
-        return not (self.x_max < object_x_min or self.x_min > object_x_max or self.y_max < object_y_min or
-                    self.y_min > object_y_max)
+        x_cond = self.x_max < object_x_min or self.x_min > object_x_max
+        y_cond = self.y_max < object_y_min or self.y_min > object_y_max
+
+        return not (x_cond or y_cond)
 
 
 class LocalListener:
@@ -120,6 +123,7 @@ class LocalListener:
         self.listener = keyboard.Listener(
             on_press=function_name
         )
+
     def listen(self):
         self.listener.start()
 
@@ -151,13 +155,13 @@ class GameActions:
 
     def paddles_movement(self, key):
         try:
-            if key == keyboard.Key.up and self.paddle_right.rect.y  > 0:
+            if key == keyboard.Key.up and self.paddle_right.rect.y > 0:
                 self.paddle_right.move_paddle_up()
             elif key == keyboard.Key.down and self.paddle_right.rect.y + self.paddle_right.height < self.scene.height:
                 self.paddle_right.move_paddle_down()
             elif key.char == 'w' and self.paddle_left.rect.y > 0:
                 self.paddle_left.move_paddle_up()
-            elif key.char == 's' and self.paddle_left.rect.y + self.paddle_left.height < self.scene.height :
+            elif key.char == 's' and self.paddle_left.rect.y + self.paddle_left.height < self.scene.height:
                 self.paddle_left.move_paddle_down()
         except Exception:
             print(False)
@@ -178,8 +182,8 @@ class CurrentGameObjectsFactory:
         # parameters for a ball
         ball_surf_width = self.ball_radius * 2
         ball_surf_height = self.ball_radius * 2
-        ball_x_speed =  random.randint(1, 5)
-        ball_y_speed =  random.randint(1, 5)
+        ball_x_speed = random.randint(1, 5)
+        ball_y_speed = random.randint(1, 5)
         #
         ball_x_start = self.x_mid
         ball_y_start = self.y_mid
