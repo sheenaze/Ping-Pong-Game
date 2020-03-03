@@ -62,16 +62,22 @@ class Ball(ObjectBase):
 
 
 class Paddle(ObjectBase):
-    def __init__(self, width, height, x, y, color, y_direction=100):
+    def __init__(self, width, height, x, y, color, y_speed=100):
         super(Paddle, self).__init__(width, height, x, y, color)
-        self.y_direction = y_direction
+        self.y_speed = y_speed
         pg.draw.line(self.surface, color, [0, 0], [0, self.height], 20)
 
     def move_paddle_up(self):
-        self.rect.y -= self.y_direction
+        if self.rect.y >= self.y_speed:
+            self.rect.y -= self.y_speed
+        else:
+            self.rect.y -= self.rect.y
 
-    def move_paddle_down(self):
-        self.rect.y += self.y_direction
+    def move_paddle_down(self, window_height):
+        if window_height - (self.rect.y + self.rect[3]) >= self.y_speed:
+            self.rect.y += self.y_speed
+        else:
+            self.rect.y += window_height - (self.rect.y + self.rect[3])
 
 
 class Collisions(Enum):
@@ -121,9 +127,7 @@ class DetectCollisions:
 class LocalListener:
     def __init__(self, function_name):
         self.listener = keyboard.Listener(
-            on_press=function_name
-        )
-
+            on_press=function_name)
     def listen(self):
         self.listener.start()
 
@@ -153,16 +157,23 @@ class GameActions:
             self.ball.bounce_y()
             self.ball.bounce_x()
 
+    # def check_paddle_movement(self, paddle):
+    #     if paddle.rect.y > 0:
+    #         delta = self.scene.rect[1] - paddle.rect.y
+    #         if delta < paddle.y_speed:
+
+
+
     def paddles_movement(self, key):
         try:
             if key == keyboard.Key.up and self.paddle_right.rect.y > 0:
-                self.paddle_right.move_paddle_up()
+                self.paddle_right.move_paddle_up() #
             elif key == keyboard.Key.down and self.paddle_right.rect.y + self.paddle_right.height < self.scene.height:
-                self.paddle_right.move_paddle_down()
+                self.paddle_right.move_paddle_down(self.scene.height)
             elif key.char == 'w' and self.paddle_left.rect.y > 0:
                 self.paddle_left.move_paddle_up()
             elif key.char == 's' and self.paddle_left.rect.y + self.paddle_left.height < self.scene.height:
-                self.paddle_left.move_paddle_down()
+                self.paddle_left.move_paddle_down(self.scene.height)
         except Exception:
             print(False)
 
