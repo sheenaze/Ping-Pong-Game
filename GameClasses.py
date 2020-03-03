@@ -1,5 +1,6 @@
 import pygame as pg
 from pynput import keyboard
+from enum import Enum
 # import time
 import random
 
@@ -20,7 +21,7 @@ class Board:
         pg.display.update()
 
 
-class Object:
+class ObjectBase:
     def __init__(self, width, height, x, y, color):
         self.width = int(width)
         self.height = int(height)
@@ -34,7 +35,15 @@ class Object:
         window.blit(self.surface, self.rect)
 
 
-class Ball(Object):
+class Counter(ObjectBase):
+    def __init__(self, width, height, x, y, color, text_color = (0,0,0)):
+        super(Counter, self).__init__(self, width, height, x, y, color)
+        self.text_color = text_color
+        self.result = [0, 0]
+        
+
+
+class Ball(ObjectBase):
     def __init__(self, width, height, x, y, color, radius, x_direction=0, y_direction=0):
         super(Ball, self).__init__(width, height, x, y, color)
         self.radius = radius
@@ -53,8 +62,8 @@ class Ball(Object):
         self.rect.y += self.y_direction
 
 
-class Paddle(Object):
-    def __init__(self, width, height, x, y, color, y_direction=90):
+class Paddle(ObjectBase):
+    def __init__(self, width, height, x, y, color, y_direction=100):
         super(Paddle, self).__init__(width, height, x, y, color)
         self.y_direction = y_direction
         pg.draw.line(self.surface, color, [0, 0], [0, self.height], 20)
@@ -64,6 +73,12 @@ class Paddle(Object):
 
     def move_paddle_down(self):
         self.rect.y += self.y_direction
+
+
+class Collisions(Enum):
+    x_collision = 1
+    y_collision = 2
+    corner_collision = 3
 
 
 class DetectCollisions:
@@ -79,13 +94,15 @@ class DetectCollisions:
         board_y_min = outside_object_rect[1]
         board_y_max = outside_object_rect[1] + outside_object_rect[3]
 
-        if not (self.x_min > board_x_min and self.x_max < board_x_max and self.y_min > board_y_min and
+        if not (self.x_min > board_x_min and self.x_max < board_x_max or self.y_min > board_y_min and
                 self.y_max < board_y_max):
-            return 'XY_collision'
+            return Collisions.corner_collision
+
         elif not (self.x_min > board_x_min and self.x_max < board_x_max):
-            return 'X_collision'
+            return Collisions.x_collision
+
         elif not (self.y_min > board_y_min and self.y_max < board_y_max):
-            return 'Y_collision'
+            return Collisions.y_collision
 
     def excluded_object_collision(self, object_rect):
 
@@ -124,17 +141,17 @@ class GameActions:
         ball_paddle_left_collision = ball_collisions.excluded_object_collision(self.paddle_left.rect)
         ball_paddle_right_collision = ball_collisions.excluded_object_collision(self.paddle_right.rect)
 
-        if ball_window_collision == 'X_collision' or ball_paddle_left_collision or ball_paddle_right_collision:
+        if ball_window_collision == Collisions.x_collision or ball_paddle_left_collision or ball_paddle_right_collision:
             self.ball.bounce_x()
-        elif ball_window_collision == 'Y_collision':
+        elif ball_window_collision == Collisions.y_collision:
             self.ball.bounce_y()
-        elif ball_window_collision == 'XY_collision':
+        elif ball_window_collision == Collisions.corner_collision:
             self.ball.bounce_y()
             self.ball.bounce_x()
 
     def paddles_movement(self, key):
         try:
-            if key == keyboard.Key.up and self.paddle_right.rect.y > 0:
+            if key == keyboard.Key.up and self.paddle_right.rect.y  > 0:
                 self.paddle_right.move_paddle_up()
             elif key == keyboard.Key.down and self.paddle_right.rect.y + self.paddle_right.height < self.scene.height:
                 self.paddle_right.move_paddle_down()
@@ -146,7 +163,7 @@ class GameActions:
             print(False)
 
 
-class CurrentGameObjects:
+class CurrentGameObjectsFactory:
     def __init__(self, window_width, window_height, paddles_color, ball_radius, ball_color):
         self.window_width = window_width
         self.x_mid = int(window_width / 2)
@@ -161,8 +178,8 @@ class CurrentGameObjects:
         # parameters for a ball
         ball_surf_width = self.ball_radius * 2
         ball_surf_height = self.ball_radius * 2
-        ball_x_speed = 5  # random.randint(1, 5)
-        ball_y_speed = 0  # random.randint(1, 5)
+        ball_x_speed =  random.randint(1, 5)
+        ball_y_speed =  random.randint(1, 5)
         #
         ball_x_start = self.x_mid
         ball_y_start = self.y_mid
