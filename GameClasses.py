@@ -35,16 +35,34 @@ class ObjectBase:
         window.blit(self.surface, self.rect)
 
 
-class ResultDisplay(ObjectBase):
-    def __init__(self, width, height, x, y, color, text_color=(0, 0, 0)):
-        super(ResultDisplay, self).__init__(width, height, x, y, color)
-        self.text_color = text_color
-        self.result = '0:0'
+class FontNames(Enum):
+    arial = 'arial'
+    comic = 'comicsansms'
+    calibri = 'calibri'
+    cambria = 'cambria'
+    times = 'times'
+
+
+class TextWidget:
+    def __init__(self,x, y, font_name, font_size, font_color, text):
+        self.start_x = x
+        self.start_y = y
+        self.font_name = font_name
+        self.font_size = font_size
+        self.font_color = font_color
+        self.text = text
 
         pg.font.init()
-        font_path = pg.font.match_font('arial')
-        self.font = pg.font.Font(font_path, 64)
-        self.surface = self.font.render(self.result, True, self.text_color)
+        font_path = pg.font.match_font(self.font_name)
+        self.font = pg.font.Font(font_path, self.font_size)
+
+        self.text_width, self.text_height = self.font.size(self.text)
+        self.surface = self.font.render(self.text, True, self.font_color)
+        self.rect = self.surface.get_rect(x=self.start_x, y=self.start_y)
+
+    def draw(self, window):
+        window.blit(self.surface, self.rect)
+
 
 class Ball(ObjectBase):
     def __init__(self, width, height, x, y, color, radius, x_direction=0, y_direction=0):
@@ -179,6 +197,7 @@ class GameActions:
 class CurrentGameObjectsFactory:
     def __init__(self, window_width, window_height, paddles_color, ball_radius, ball_color):
         self.window_width = window_width
+        self.window_height = window_height
         self.x_mid = int(window_width / 2)
         self.y_mid = int(window_height / 2)
         self.paddles_color = paddles_color
@@ -212,8 +231,9 @@ class CurrentGameObjectsFactory:
         #
         return Paddle(self.paddle_width, self.paddle_length, right_pad_x_start, right_pad_y_start, self.paddles_color)
 
-    def get_result(self):
-        x_start = self.x_mid
-        y_start = 100
-        color = (255, 255, 255)
-        return ResultDisplay(0, 0, x_start, y_start, color, text_color=(0, 0, 0))
+    # def get_result(self):
+    #     x_start = self.x_mid
+    #     y_start = 100
+    #     color = (255, 255, 255)
+    #     font_size = int(self.window_height * 0.07)
+    #     return ResultDisplay(0, 0, x_start, y_start, color, font_size, text_color=(0, 0, 0))
