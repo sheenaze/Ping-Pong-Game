@@ -35,12 +35,16 @@ class ObjectBase:
         window.blit(self.surface, self.rect)
 
 
-class Counter(ObjectBase):
+class ResultDisplay(ObjectBase):
     def __init__(self, width, height, x, y, color, text_color=(0, 0, 0)):
-        super(Counter, self).__init__(self, width, height, x, y, color)
+        super(ResultDisplay, self).__init__(width, height, x, y, color)
         self.text_color = text_color
-        self.result = [0, 0]
+        self.result = '0:0'
 
+        pg.font.init()
+        font_path = pg.font.match_font('arial')
+        self.font = pg.font.Font(font_path, 64)
+        self.surface = self.font.render(self.result, True, self.text_color)
 
 class Ball(ObjectBase):
     def __init__(self, width, height, x, y, color, radius, x_direction=0, y_direction=0):
@@ -128,6 +132,7 @@ class LocalListener:
     def __init__(self, function_name):
         self.listener = keyboard.Listener(
             on_press=function_name)
+
     def listen(self):
         self.listener.start()
 
@@ -157,17 +162,10 @@ class GameActions:
             self.ball.bounce_y()
             self.ball.bounce_x()
 
-    # def check_paddle_movement(self, paddle):
-    #     if paddle.rect.y > 0:
-    #         delta = self.scene.rect[1] - paddle.rect.y
-    #         if delta < paddle.y_speed:
-
-
-
     def paddles_movement(self, key):
         try:
             if key == keyboard.Key.up and self.paddle_right.rect.y > 0:
-                self.paddle_right.move_paddle_up() #
+                self.paddle_right.move_paddle_up()  #
             elif key == keyboard.Key.down and self.paddle_right.rect.y + self.paddle_right.height < self.scene.height:
                 self.paddle_right.move_paddle_down(self.scene.height)
             elif key.char == 'w' and self.paddle_left.rect.y > 0:
@@ -213,3 +211,9 @@ class CurrentGameObjectsFactory:
         right_pad_y_start = self.y_mid - int(self.paddle_length / 2)
         #
         return Paddle(self.paddle_width, self.paddle_length, right_pad_x_start, right_pad_y_start, self.paddles_color)
+
+    def get_result(self):
+        x_start = self.x_mid
+        y_start = 100
+        color = (255, 255, 255)
+        return ResultDisplay(0, 0, x_start, y_start, color, text_color=(0, 0, 0))

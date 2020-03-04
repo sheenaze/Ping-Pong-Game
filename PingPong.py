@@ -7,11 +7,12 @@ class PingPong:
         pg.init()
 
         self.window = Board(window_width, window_height, window_color)
-        self.game_objects = CurrentGameObjects(window_width, window_height, paddles_color, ball_radius, ball_color)
+        self.game_objects = CurrentGameObjectsFactory(window_width, window_height, paddles_color, ball_radius, ball_color)
 
         self.ball = self.game_objects.get_ball()
         self.left_paddle = self.game_objects.get_left_paddle()
         self.right_paddle = self.game_objects.get_right_paddle()
+        self.result_display = self.game_objects.get_result()
 
         self.actions = GameActions(self.window, self.ball, self.left_paddle, self.right_paddle)
 
@@ -23,7 +24,8 @@ class PingPong:
             self.window.draw_elements(
                 self.ball,
                 self.left_paddle,
-                self.right_paddle
+                self.right_paddle,
+                self.result_display
             )
             self.fps_clock.tick(100)
 
