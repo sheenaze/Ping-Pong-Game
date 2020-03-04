@@ -45,8 +45,6 @@ class FontNames(Enum):
 
 class TextWidget:
     def __init__(self, font_name, font_size, font_color, text):
-        # self.start_x = x
-        # self.start_y = y
         self.font_name = font_name
         self.font_size = font_size
         self.font_color = font_color
@@ -55,13 +53,15 @@ class TextWidget:
         pg.font.init()
         font_path = pg.font.match_font(self.font_name)
         self.font = pg.font.Font(font_path, self.font_size)
-
         self.text_width, self.text_height = self.font.size(self.text)
+        self.surface = self.font.render(self.text, True, self.font_color)
+        self.rect = self.surface.get_rect()
 
-    def draw(self, window, start_x, start_y):
-        surface = self.font.render(self.text, True, self.font_color)
-        rect = surface.get_rect(x=start_x, y=start_y)
-        window.blit(surface, rect)
+    def set_text_rect(self, start_x, start_y):
+        self.rect = self.surface.get_rect(x=start_x, y=start_y)
+
+    def draw(self, window):
+        window.blit(self.surface, self.rect)
 
 
 class Counter:
@@ -200,7 +200,7 @@ class GameActions:
 
 
 class CurrentGameObjectsFactory:
-    def __init__(self, window_width, window_height, paddles_color, ball_radius, ball_color):
+    def __init__(self, window_width, window_height, paddles_color, ball_radius, ball_color, text_color):
         self.window_width = window_width
         self.window_height = window_height
         self.x_mid = int(window_width / 2)
@@ -210,6 +210,7 @@ class CurrentGameObjectsFactory:
         self.ball_radius = ball_radius
         self.paddle_length = 110
         self.paddle_width = 20
+        self.text_color = text_color
 
     def get_ball(self):
         # parameters for a ball
@@ -236,17 +237,9 @@ class CurrentGameObjectsFactory:
         #
         return Paddle(self.paddle_width, self.paddle_length, right_pad_x_start, right_pad_y_start, self.paddles_color)
 
-    # def print_result(self):
-    #     text = TextWidget(0, 0, FontNames.arial.value, int(self.window_height*0.08), (0,0,0), '0:0')
-    #     x_start = self.x_mid
-    #     y_start = 100
-    #     color = (255, 255, 255)
-    #     font_size = int(self.window_height * 0.07)
-    #     return ResultDisplay(0, 0, x_start, y_start, color, font_size, text_color=(0, 0, 0))
-    #
-    # def get_result(self):
-    #     x_start = self.x_mid
-    #     y_start = 100
-    #     color = (255, 255, 255)
-    #     font_size = int(self.window_height * 0.07)
-    #     return ResultDisplay(0, 0, x_start, y_start, color, font_size, text_color=(0, 0, 0))
+    def print_result(self):
+        text = TextWidget(FontNames.arial.value, int(self.window_height*0.06), self.text_color, '0:0')
+        x_start = self.x_mid - int(text.text_width/2)
+        y_start = int(self.window_height*0.01)
+        text.set_text_rect(x_start, y_start)
+        return text
