@@ -44,9 +44,9 @@ class FontNames(Enum):
 
 
 class TextWidget:
-    def __init__(self,x, y, font_name, font_size, font_color, text):
-        self.start_x = x
-        self.start_y = y
+    def __init__(self, font_name, font_size, font_color, text):
+        # self.start_x = x
+        # self.start_y = y
         self.font_name = font_name
         self.font_size = font_size
         self.font_color = font_color
@@ -57,11 +57,16 @@ class TextWidget:
         self.font = pg.font.Font(font_path, self.font_size)
 
         self.text_width, self.text_height = self.font.size(self.text)
-        self.surface = self.font.render(self.text, True, self.font_color)
-        self.rect = self.surface.get_rect(x=self.start_x, y=self.start_y)
 
-    def draw(self, window):
-        window.blit(self.surface, self.rect)
+    def draw(self, window, start_x, start_y):
+        surface = self.font.render(self.text, True, self.font_color)
+        rect = surface.get_rect(x=start_x, y=start_y)
+        window.blit(surface, rect)
+
+
+class Counter:
+    def __init__(self, ball, window):
+        pass
 
 
 class Ball(ObjectBase):
@@ -231,6 +236,14 @@ class CurrentGameObjectsFactory:
         #
         return Paddle(self.paddle_width, self.paddle_length, right_pad_x_start, right_pad_y_start, self.paddles_color)
 
+    # def print_result(self):
+    #     text = TextWidget(0, 0, FontNames.arial.value, int(self.window_height*0.08), (0,0,0), '0:0')
+    #     x_start = self.x_mid
+    #     y_start = 100
+    #     color = (255, 255, 255)
+    #     font_size = int(self.window_height * 0.07)
+    #     return ResultDisplay(0, 0, x_start, y_start, color, font_size, text_color=(0, 0, 0))
+    #
     # def get_result(self):
     #     x_start = self.x_mid
     #     y_start = 100
