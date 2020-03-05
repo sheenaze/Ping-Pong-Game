@@ -64,11 +64,6 @@ class TextWidget:
         window.blit(self.surface, self.rect)
 
 
-class Counter:
-    def __init__(self, ball, window):
-        pass
-
-
 class Ball(ObjectBase):
     def __init__(self, width, height, x, y, color, radius, x_direction=0, y_direction=0):
         super(Ball, self).__init__(width, height, x, y, color)
@@ -166,8 +161,10 @@ class GameActions:
         self.ball = ball
         self.paddle_left = paddle_left
         self.paddle_right = paddle_right
-        self.padle_listener = LocalListener(self.paddles_movement)
-        self.padle_listener.listen()
+        self.paddle_listener = LocalListener(self.paddles_movement)
+        self.paddle_listener.listen()
+        self.counter_left = 0
+        self.counter_right = 0
 
     def ball_movement(self):
         self.ball.move()
@@ -197,6 +194,14 @@ class GameActions:
                 self.paddle_left.move_paddle_down(self.scene.height)
         except Exception:
             print(False)
+
+    def count_points(self):
+        # at the beginning I check if the ball crossed the line of paddles, then I'll change it to the window border
+        if self.ball.rect.x > self.paddle_right.rect.x:
+            self.counter_left += 1
+        elif self.ball.rect.x < self.paddle_left.rect.x:
+            self.counter_right += 1
+        return f'{self.counter_left}:{self.counter_right}'
 
 
 class CurrentGameObjectsFactory:
@@ -237,9 +242,9 @@ class CurrentGameObjectsFactory:
         #
         return Paddle(self.paddle_width, self.paddle_length, right_pad_x_start, right_pad_y_start, self.paddles_color)
 
-    def print_result(self):
-        text = TextWidget(FontNames.arial.value, int(self.window_height*0.06), self.text_color, '0:0')
-        x_start = self.x_mid - int(text.text_width/2)
-        y_start = int(self.window_height*0.01)
+    def result_display(self, result_text):
+        text = TextWidget(FontNames.arial.value, int(self.window_height * 0.06), self.text_color, result_text)
+        x_start = self.x_mid - int(text.text_width / 2)
+        y_start = int(self.window_height * 0.01)
         text.set_text_rect(x_start, y_start)
         return text
