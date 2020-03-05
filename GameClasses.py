@@ -85,6 +85,10 @@ class Ball(ObjectBase):
         self.rect.x += self.x_direction
         self.rect.y += self.y_direction
 
+    def reset_movement_vector(self):
+        self.x_direction = random.randint(1, 5)
+        self.y_direction = random.randint(1, 5)
+
 
 class Paddle(ObjectBase):
     def __init__(self, width, height, x, y, color, y_speed=100):
@@ -177,13 +181,10 @@ class GameActions:
         ball_paddle_left_collision = ball_collisions.excluded_object_collision(self.paddle_left.rect)
         ball_paddle_right_collision = ball_collisions.excluded_object_collision(self.paddle_right.rect)
 
-        if ball_window_collision == Collisions.x_collision or ball_paddle_left_collision or ball_paddle_right_collision:
+        if ball_paddle_left_collision or ball_paddle_right_collision:
             self.ball.bounce_x()
         elif ball_window_collision == Collisions.y_collision:
             self.ball.bounce_y()
-        elif ball_window_collision == Collisions.corner_collision:
-            self.ball.bounce_y()
-            self.ball.bounce_x()
 
     def paddles_movement(self, key):
         try:
@@ -202,13 +203,13 @@ class GameActions:
         self.ball.reset_position()
         self.paddle_left.reset_position()
         self.paddle_right.reset_position()
+        self.ball.reset_movement_vector()
 
     def count_points(self):
-        # at the beginning I check if the ball crossed the line of paddles, then I'll change it to the window border
-        if self.ball.rect.x > self.paddle_right.rect.x:  #self.scene.rect[0] + self.scene.rect[2]:
+        if self.ball.rect.x > self.scene.rect[0] + self.scene.rect[2]:
             self.counter_left += 1
             self.reset_all_positions()
-        elif self.ball.rect.x < self.paddle_left.rect.x:  #self.scene.rect[0]:
+        elif self.ball.rect.x < self.scene.rect[0]:
             self.counter_right += 1
             self.reset_all_positions()
         return f'{self.counter_left}:{self.counter_right}'
