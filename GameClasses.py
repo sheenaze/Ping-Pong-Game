@@ -34,6 +34,9 @@ class ObjectBase:
     def draw(self, window):
         window.blit(self.surface, self.rect)
 
+    def reset_position(self):
+        self.rect = self.surface.get_rect(x=self.start_x, y=self.start_y)
+
 
 class FontNames(Enum):
     arial = 'arial'
@@ -195,12 +198,19 @@ class GameActions:
         except Exception:
             print(False)
 
+    def reset_all_positions(self):
+        self.ball.reset_position()
+        self.paddle_left.reset_position()
+        self.paddle_right.reset_position()
+
     def count_points(self):
         # at the beginning I check if the ball crossed the line of paddles, then I'll change it to the window border
-        if self.ball.rect.x > self.paddle_right.rect.x:
+        if self.ball.rect.x > self.paddle_right.rect.x:  #self.scene.rect[0] + self.scene.rect[2]:
             self.counter_left += 1
-        elif self.ball.rect.x < self.paddle_left.rect.x:
+            self.reset_all_positions()
+        elif self.ball.rect.x < self.paddle_left.rect.x:  #self.scene.rect[0]:
             self.counter_right += 1
+            self.reset_all_positions()
         return f'{self.counter_left}:{self.counter_right}'
 
 
